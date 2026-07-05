@@ -18,7 +18,11 @@ class _QuizState extends State<Quiz> {
   void switchScreen() {
     setState(() {
       if (activeScreen == "start-screen") {
-        activeScreen = "setup-screen";
+        {
+          activeScreen = "setup-screen";
+        }
+      } else if (activeScreen == "setup-screen") {
+        activeScreen = "start-screen";
       }
     });
   }
@@ -27,7 +31,9 @@ class _QuizState extends State<Quiz> {
   Widget build(BuildContext context) {
     var screenWidget = activeScreen == "start-screen"
         ? StartScreen(switchScreen)
-        : SetupScreen();
+        : activeScreen == "setup-screen"
+        ? SetupScreen(switchScreen)
+        : StartScreen(switchScreen);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
