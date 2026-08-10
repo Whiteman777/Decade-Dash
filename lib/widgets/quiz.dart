@@ -1,5 +1,6 @@
-import 'package:decadedash/setup_screen.dart';
-import 'package:decadedash/start_screen.dart';
+import 'package:decadedash/widgets/screens/question_screen.dart';
+import 'package:decadedash/widgets/screens/setup_screen.dart';
+import 'package:decadedash/widgets/screens/start_screen.dart';
 import 'package:decadedash/theme/background_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,7 @@ class Quiz extends StatefulWidget {
 }
 
 class _QuizState extends State<Quiz> {
+  final List<String> answers = [];
   var activeScreen = "start-screen";
 
   void switchScreen() {
@@ -22,9 +24,13 @@ class _QuizState extends State<Quiz> {
           activeScreen = "setup-screen";
         }
       } else if (activeScreen == "setup-screen") {
-        activeScreen = "start-screen";
+        activeScreen = "question-screen";
       }
     });
+  }
+
+  void selectAnswer(String answer) {
+    answers.add(answer);
   }
 
   @override
@@ -33,7 +39,10 @@ class _QuizState extends State<Quiz> {
         ? StartScreen(switchScreen)
         : activeScreen == "setup-screen"
         ? SetupScreen(switchScreen)
-        : StartScreen(switchScreen);
+        : QuestionScreen(
+            switchScreen,
+            onSelectedAnswer: selectAnswer,
+          );
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

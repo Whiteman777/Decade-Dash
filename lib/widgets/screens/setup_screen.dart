@@ -1,13 +1,13 @@
 import 'dart:ui';
 
-import 'package:decadedash/buttons/difficulty_button.dart';
-import 'package:decadedash/buttons/duration_button.dart';
-import 'package:decadedash/buttons/start_quiz_button.dart';
+import 'package:decadedash/widgets/buttons/difficulty_button.dart';
+import 'package:decadedash/widgets/buttons/duration_button.dart';
+import 'package:decadedash/widgets/buttons/start_quiz_button.dart';
 import 'package:decadedash/enums/duration.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'enums/difficulty.dart';
+import '../../../enums/difficulty.dart';
 
 class SetupScreen extends StatefulWidget {
   final Function() start;
