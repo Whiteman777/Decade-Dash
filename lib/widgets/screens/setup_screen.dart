@@ -10,7 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../enums/difficulty.dart';
 
 class SetupScreen extends StatefulWidget {
-  final Function() start;
+  final void Function(Difficulty difficulty, DurationTime duration) start;
   const SetupScreen(
     this.start, {
     super.key,
@@ -36,6 +36,10 @@ class _SetupScreenState extends State<SetupScreen> {
     setState(() {
       _selectedDuration = duration;
     });
+  }
+
+  void _startQuiz() {
+    widget.start(_selectedDifficulty!, _selectedDuration!);
   }
 
   @override
@@ -245,7 +249,7 @@ class _SetupScreenState extends State<SetupScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
               child: StartQuizButton(
-                widget.start,
+                _startQuiz,
                 isEnabled:
                     _selectedDifficulty != null && _selectedDuration != null,
               ),

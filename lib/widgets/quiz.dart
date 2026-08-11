@@ -1,3 +1,5 @@
+import 'package:decadedash/enums/difficulty.dart';
+import 'package:decadedash/enums/duration.dart';
 import 'package:decadedash/widgets/screens/question_screen.dart';
 import 'package:decadedash/widgets/screens/setup_screen.dart';
 import 'package:decadedash/widgets/screens/start_screen.dart';
@@ -15,6 +17,8 @@ class Quiz extends StatefulWidget {
 
 class _QuizState extends State<Quiz> {
   final List<String> answers = [];
+  DurationTime? _duration;
+  Difficulty? _difficulty;
   var activeScreen = "start-screen";
 
   void switchScreen() {
@@ -23,8 +27,8 @@ class _QuizState extends State<Quiz> {
         {
           activeScreen = "setup-screen";
         }
-      } else if (activeScreen == "setup-screen") {
-        activeScreen = "question-screen";
+      } else if (activeScreen == "question-screen") {
+        activeScreen = "start-screen";
       }
     });
   }
@@ -33,15 +37,25 @@ class _QuizState extends State<Quiz> {
     answers.add(answer);
   }
 
+  void startQuiz(Difficulty difficulty, DurationTime duration) {
+    _difficulty = difficulty;
+    _duration = duration;
+    setState(() {
+      activeScreen = "question-screen";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenWidget = activeScreen == "start-screen"
         ? StartScreen(switchScreen)
         : activeScreen == "setup-screen"
-        ? SetupScreen(switchScreen)
+        ? SetupScreen(startQuiz)
         : QuestionScreen(
             switchScreen,
             onSelectedAnswer: selectAnswer,
+            duration: _duration,
+            difficulty: _difficulty,
           );
 
     return MaterialApp(
