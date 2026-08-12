@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:async';
 
 import 'package:decadedash/data/questions.dart';
 import 'package:decadedash/enums/difficulty.dart';
@@ -11,7 +12,7 @@ import '../../enums/duration.dart';
 
 class QuestionScreen extends StatefulWidget {
   final Function() switchScreen;
-  final Function(String answer) onSelectedAnswer;
+  final Function(String? answer)? onSelectedAnswer;
   final DurationTime? duration;
   final Difficulty? difficulty;
 
@@ -32,10 +33,37 @@ class QuestionScreen extends StatefulWidget {
 class _QuestionScreenState extends State<QuestionScreen> {
   late List<String> _answers;
   var currentIndex = 0;
-
+  Timer? _timer;
+  int _secondsLeft = 0;
+  var hintCounter = 0;
   late final List<Question> _quiz =
       questions.where((q) => q.difficulty == widget.difficulty).toList()
         ..shuffle();
+
+  Color get durationColor {
+    final s = _secondsLeft;
+    return switch (widget.duration) {
+      DurationTime.twenty =>
+        s <= 5
+            ? Colors.red.shade400
+            : s <= 10
+            ? Colors.amber
+            : Colors.green,
+      DurationTime.fifteen =>
+        s <= 3
+            ? Colors.red.shade400
+            : s <= 7
+            ? Colors.amber
+            : Colors.green,
+      DurationTime.ten =>
+        s <= 3
+            ? Colors.red.shade400
+            : s <= 5
+            ? Colors.amber
+            : Colors.green,
+      null => Colors.green,
+    };
+  }
 
   void _loadNextAnswers() {
     setState(() {
@@ -47,23 +75,85 @@ class _QuestionScreenState extends State<QuestionScreen> {
   void initState() {
     super.initState();
     _loadNextAnswers();
+    _startTimer();
   }
 
-  void nextQuestion(String answer) {
-    setState(() {
-      currentIndex++;
-    });
-    widget.onSelectedAnswer(answer);
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void nextQuestion(String? answer) {
+    if (!(currentIndex >= _quiz.length - 1)) {
+      setState(() {
+        currentIndex++;
+        hintCounter = 0;
+      });
+    }
+    _startTimer();
+    widget.onSelectedAnswer?.call(answer);
     _loadNextAnswers();
   }
 
-  void endQuiz() {
-    if (currentIndex == _quiz.length - 1) {
+  void _endQuiz() {
+    if (currentIndex >= _quiz.length - 1) {
       setState(() {
         currentIndex = 0;
         widget.switchScreen();
       });
     }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    setState(() {
+      _secondsLeft = widget.duration!.seconds;
+    });
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsLeft <= 1) {
+        timer.cancel();
+        setState(() {
+          String? answer;
+          _secondsLeft = 0;
+          _endQuiz();
+          nextQuestion(answer);
+        });
+      } else {
+        setState(() => _secondsLeft--);
+      }
+    });
+  }
+
+  void showHintDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("Need a hint?"),
+        content: Text(_quiz[currentIndex].hint),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                hintCounter++;
+              });
+              Navigator.pop(ctx);
+            },
+            child: Text("Got it!"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color get hintIconColor {
+    var color = Colors.white.withValues(alpha: 0.95);
+    setState(() {
+      if (hintCounter >= 1) {
+        color = Colors.yellow;
+      }
+    });
+    return color;
   }
 
   @override
@@ -88,15 +178,19 @@ class _QuestionScreenState extends State<QuestionScreen> {
       body: Container(
         margin: EdgeInsets.all(30),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              "Progress".toUpperCase(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-              ),
-              textAlign: TextAlign.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "Progress".toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+              ],
             ),
             Row(
               children: [
@@ -127,14 +221,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         children: [
                           Icon(
                             Icons.timer_outlined,
-                            color: Colors.green,
+                            color: durationColor,
                             size: 20,
                           ),
                           SizedBox(width: 5),
                           Text(
-                            "20s",
+                            "${_secondsLeft}s",
                             style: TextStyle(
-                              color: Colors.amber,
+                              color: durationColor,
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
                             ),
@@ -198,14 +292,39 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ],
               ),
             ),
+            GestureDetector(
+              onTap: showHintDialog,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 8,
+                ),
+                margin: EdgeInsets.symmetric(horizontal: 135),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.25),
+                  ),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline_rounded,
+                      color: hintIconColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             SizedBox(
-              height: 20,
+              height: 10,
             ),
             ..._answers.map(
               (answer) => AnswerButton(
                 answer: answer,
                 onTap: () {
-                  endQuiz();
+                  _endQuiz();
                   nextQuestion(answer);
                 },
               ),

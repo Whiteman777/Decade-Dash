@@ -4,11 +4,13 @@ class Question {
   String name;
   List<String> answer;
   Difficulty difficulty;
+  String hint;
 
   Question(
     this.name,
     this.answer,
     this.difficulty,
+    this.hint,
   );
 
   List<String> get shuffledAnswers {
