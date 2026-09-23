@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class DurationButton extends StatelessWidget {
   final String text;
@@ -53,7 +52,7 @@ class DurationButton extends StatelessWidget {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.googleSans(
+              style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
                 color: isSelected ? Colors.black : Colors.white,
                 fontSize: 25,
                 fontWeight: FontWeight.bold,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class DifficultyButtons extends StatelessWidget {
   final IconData icon;
@@ -60,7 +59,7 @@ class DifficultyButtons extends StatelessWidget {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.googleSans(
+              style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

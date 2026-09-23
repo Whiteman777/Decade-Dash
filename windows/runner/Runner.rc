@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "decadedash" "\0"
+            VALUE "CompanyName", "DecadeDash" "\0"
+            VALUE "FileDescription", "DecadeDash" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "decadedash" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
+            VALUE "InternalName", "DecadeDash" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 DecadeDash. All rights reserved." "\0"
             VALUE "OriginalFilename", "decadedash.exe" "\0"
-            VALUE "ProductName", "decadedash" "\0"
+            VALUE "ProductName", "DecadeDash" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

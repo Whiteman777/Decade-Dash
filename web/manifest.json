@@ -1,6 +1,6 @@
 {
-    "name": "decadedash",
-    "short_name": "decadedash",
+    "name": "DecadeDash",
+    "short_name": "DecadeDash",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
