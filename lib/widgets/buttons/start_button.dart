@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class StartButton extends StatelessWidget {
-  final Function() initialize;
-  const StartButton(this.initialize, {super.key});
+  final Icon icon;
+  final String label;
+  final Function()? initialize;
+  const StartButton({
+    super.key,
+    this.initialize,
+    required this.icon,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +27,11 @@ class StartButton extends StatelessWidget {
         ),
       ),
       iconAlignment: IconAlignment.end,
-      icon: Icon(
-        Icons.arrow_forward_rounded,
-        color: Colors.white,
-      ),
+      icon: icon,
       label: Text(
-        "Start",
+        label,
         textAlign: TextAlign.center,
-        style: GoogleFonts.googleSans(
+        style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
           color: Colors.white,
           fontSize: 30,
           fontWeight: FontWeight.bold,

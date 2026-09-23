@@ -1,27 +1,29 @@
 import 'dart:ui';
 import 'dart:async';
 
-import 'package:decadedash/data/questions.dart';
 import 'package:decadedash/enums/difficulty.dart';
 import 'package:decadedash/models/question.dart';
+import 'package:decadedash/widgets/brand_app_bar.dart';
 import 'package:decadedash/widgets/buttons/answer_button.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../enums/duration.dart';
 
 class QuestionScreen extends StatefulWidget {
   final Function() switchScreen;
-  final Function(String? answer)? onSelectedAnswer;
+  final Function(Question question, String? answer, bool usedHint)?
+      onSelectedAnswer;
   final DurationTime? duration;
   final Difficulty? difficulty;
+  final List<Question> quizQuestions;
 
   const QuestionScreen(
     this.switchScreen, {
     super.key,
-    required this.onSelectedAnswer,
+    required this.quizQuestions,
     required this.difficulty,
     required this.duration,
+    this.onSelectedAnswer,
   });
 
   @override
@@ -33,12 +35,9 @@ class QuestionScreen extends StatefulWidget {
 class _QuestionScreenState extends State<QuestionScreen> {
   late List<String> _answers;
   var currentIndex = 0;
+  var hintCounter = false;
   Timer? _timer;
   int _secondsLeft = 0;
-  var hintCounter = 0;
-  late final List<Question> _quiz =
-      questions.where((q) => q.difficulty == widget.difficulty).toList()
-        ..shuffle();
 
   Color get durationColor {
     final s = _secondsLeft;
@@ -67,7 +66,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   void _loadNextAnswers() {
     setState(() {
-      _answers = _quiz[currentIndex].shuffledAnswers;
+      _answers = widget.quizQuestions[currentIndex].shuffledAnswers;
     });
   }
 
@@ -84,24 +83,22 @@ class _QuestionScreenState extends State<QuestionScreen> {
     super.dispose();
   }
 
-  void nextQuestion(String? answer) {
-    if (!(currentIndex >= _quiz.length - 1)) {
-      setState(() {
-        currentIndex++;
-        hintCounter = 0;
-      });
-    }
-    _startTimer();
-    widget.onSelectedAnswer?.call(answer);
-    _loadNextAnswers();
-  }
+  void handleAnswer(String? answer) {
+    final question = widget.quizQuestions[currentIndex];
+    widget.onSelectedAnswer?.call(question, answer, hintCounter);
 
-  void _endQuiz() {
-    if (currentIndex >= _quiz.length - 1) {
+    if (currentIndex >= widget.quizQuestions.length - 1) {
       setState(() {
         currentIndex = 0;
-        widget.switchScreen();
       });
+      widget.switchScreen();
+    } else {
+      setState(() {
+        currentIndex++;
+        hintCounter = false;
+      });
+      _startTimer();
+      _loadNextAnswers();
     }
   }
 
@@ -114,10 +111,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
       if (_secondsLeft <= 1) {
         timer.cancel();
         setState(() {
-          String? answer;
           _secondsLeft = 0;
-          _endQuiz();
-          nextQuestion(answer);
+          handleAnswer(null);
         });
       } else {
         setState(() => _secondsLeft--);
@@ -126,55 +121,163 @@ class _QuestionScreenState extends State<QuestionScreen> {
   }
 
   void showHintDialog() {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text("Need a hint?"),
-        content: Text(_quiz[currentIndex].hint),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                hintCounter++;
-              });
-              Navigator.pop(ctx);
-            },
-            child: Text("Got it!"),
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss Hint',
+      barrierColor: Colors.black.withValues(alpha: 0.70),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Material(
+              color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 16,
+                    sigmaY: 16,
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxWidth: 360),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 32,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      borderRadius: BorderRadiusGeometry.circular(16),
+                      border: Border.all(
+                        color: Color(0xff008080),
+                        width: 3,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xff008080),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.yellow,
+                              width: 2,
+                            ),
+                            shape: BoxShape.circle,
+                            color: Colors.black.withValues(alpha: 0.5),
+                          ),
+                          child: const Icon(
+                            Icons.lightbulb_outline_rounded,
+                            color: Colors.yellow,
+                            size: 36,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          "Need a hint?",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          widget.quizQuestions[currentIndex].hint,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontFamily: 'Lato', 
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 15,
+                            height: 1.45,
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                hintCounter = true;
+                              });
+                              Navigator.pop(context);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.black
+                                  .withValues(alpha: 0.5),
+                              side: BorderSide(
+                                width: 2,
+                                color: Color(0xff008080),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            iconAlignment: IconAlignment.end,
+                            label: Text(
+                              "Got it!",
+                              style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+            child: child,
+          ),
+        );
+      },
     );
   }
 
   Color get hintIconColor {
     var color = Colors.white.withValues(alpha: 0.95);
-    setState(() {
-      if (hintCounter >= 1) {
-        color = Colors.yellow;
-      }
-    });
+    if (hintCounter) {
+      color = Colors.yellow;
+    }
     return color;
   }
 
   @override
   Widget build(BuildContext context) {
     var x = currentIndex + 1;
-    var y = _quiz.length;
-    var currentQuestion = _quiz[currentIndex];
+    var y = widget.quizQuestions.length;
+    var currentQuestion = widget.quizQuestions[currentIndex];
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(
-          "DecadeDash",
-          style: GoogleFonts.lato(
-            fontWeight: FontWeight.bold,
-            color: Color(0xff008080),
-          ),
-        ),
-        actions: [],
-      ),
+      appBar: BrandAppBar(),
       body: Container(
         margin: EdgeInsets.all(30),
         child: Column(
@@ -324,8 +427,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
               (answer) => AnswerButton(
                 answer: answer,
                 onTap: () {
-                  _endQuiz();
-                  nextQuestion(answer);
+                  handleAnswer(answer);
                 },
               ),
             ),

@@ -1,10 +1,9 @@
-import 'package:decadedash/widgets//buttons/start_button.dart';
+import 'package:decadedash/widgets/buttons/start_button.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class StartScreen extends StatelessWidget {
-  final Function() screen;
-  const StartScreen(this.screen, {super.key});
+  final VoidCallback onStart;
+  const StartScreen({super.key, required this.onStart});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +20,7 @@ class StartScreen extends StatelessWidget {
           ),
           Text(
             "Decade Dash",
-            style: GoogleFonts.googleSans(
+            style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
               color: Colors.white,
               fontSize: 35,
               fontWeight: FontWeight.bold,
@@ -34,7 +33,7 @@ class StartScreen extends StatelessWidget {
             opacity: 0.65,
             child: Text(
               "Test your history knowledge!",
-              style: GoogleFonts.googleSans(
+              style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
                 color: Colors.white,
                 fontSize: 20,
               ),
@@ -43,7 +42,14 @@ class StartScreen extends StatelessWidget {
           SizedBox(
             height: 40,
           ),
-          StartButton(screen),
+          StartButton(
+            initialize: onStart,
+            icon: Icon(
+              Icons.arrow_forward_rounded,
+              color: Colors.white,
+            ),
+            label: "Start",
+          ),
         ],
       ),
     );

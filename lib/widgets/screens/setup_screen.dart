@@ -5,7 +5,6 @@ import 'package:decadedash/widgets/buttons/duration_button.dart';
 import 'package:decadedash/widgets/buttons/start_quiz_button.dart';
 import 'package:decadedash/enums/duration.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../enums/difficulty.dart';
 
@@ -55,7 +54,7 @@ class _SetupScreenState extends State<SetupScreen> {
             Text(
               "Setup your quiz",
               textAlign: TextAlign.center,
-              style: GoogleFonts.googleSans(
+              style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
                 color: Colors.white,
                 fontSize: resp(30),
                 fontWeight: FontWeight.bold,
@@ -69,7 +68,7 @@ class _SetupScreenState extends State<SetupScreen> {
                 child: Text(
                   "Configure your quiz before starting your journey.",
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.googleSans(
+                  style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
                     color: Colors.white,
                     fontSize: resp(16),
                   ),
@@ -95,7 +94,7 @@ class _SetupScreenState extends State<SetupScreen> {
                       Text(
                         "Choose Difficulty",
                         textAlign: TextAlign.left,
-                        style: GoogleFonts.googleSans(
+                        style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
                           color: Colors.white,
                           fontSize: resp(18),
                           fontWeight: FontWeight.bold,
@@ -177,7 +176,7 @@ class _SetupScreenState extends State<SetupScreen> {
                       Text(
                         "Question Duration",
                         textAlign: TextAlign.left,
-                        style: GoogleFonts.googleSans(
+                        style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
                           color: Colors.white,
                           fontSize: resp(18),
                           fontWeight: FontWeight.bold,

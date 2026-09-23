@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class StartQuizButton extends StatelessWidget {
-  final Function() initialize;
+  final VoidCallback initialize;
   final bool isEnabled;
 
   const StartQuizButton(
@@ -34,7 +33,7 @@ class StartQuizButton extends StatelessWidget {
       label: Text(
         "Start Quiz",
         textAlign: TextAlign.center,
-        style: GoogleFonts.googleSans(
+        style: TextStyle(fontFamily: 'Plus Jakarta Sans', 
           color: isEnabled ? Colors.white : Colors.white.withValues(alpha: 0.3),
           fontSize: 30,
           fontWeight: FontWeight.bold,
