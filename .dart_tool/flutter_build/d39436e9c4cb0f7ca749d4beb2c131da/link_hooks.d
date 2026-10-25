@@ -1,0 +1,1 @@
+ /tmp/opencode/demos/decadedash/.dart_tool/flutter_build/d39436e9c4cb0f7ca749d4beb2c131da/link_hooks_result.json: 
